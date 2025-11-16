@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Alpha Kiosk
+Description=Custom Alpha Kiosk Theme
+ModuleName=script
+
+[script]
+ImageDir=/lib/plymouth/themes/alpha-kiosk
+ScriptFile=/lib/plymouth/themes/alpha-kiosk/alpha-kiosk.script

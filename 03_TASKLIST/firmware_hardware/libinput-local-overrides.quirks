@@ -1,0 +1,17 @@
+[AlphaOS EloTouch Large Area]
+MatchName=EloTouch Solutions 2702
+MatchUSBID=04E7:0050
+AttrTouchSizeRange=500:2000
+AttrPalmSizeThreshold=1800
+
+[AlphaOS eGalax Invert Y]
+MatchName=eGalax Inc. USB TouchController
+MatchUSBID=0EEF:0001
+AttrOrientationAware=1
+AttrInvertY=1
+
+[AlphaOS Goodix Noise Filter]
+MatchName=Goodix Capacitive TouchScreen
+MatchUSBID=27C6:0113
+AttrResolutionHint=4096x4096
+AttrPalmSizeThreshold=1700

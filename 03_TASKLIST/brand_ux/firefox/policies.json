@@ -1,0 +1,60 @@
+{
+  "policies": {
+    "AppAutoUpdate": false,
+    "DisableAppUpdate": true,
+    "DisableFirefoxAccounts": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "DisableProfileImport": true,
+    "DisableProfileRefresh": true,
+    "DisableBuiltinPDFViewer": false,
+    "DisableMasterPasswordCreation": true,
+    "DisableSecurityBypass": {
+      "InvalidCertificate": true,
+      "SafeBrowsing": true
+    },
+    "DisableSystemAddonUpdate": true,
+    "DisableTelemetry": true,
+    "DNSOverHTTPS": {
+      "Enabled": false
+    },
+    "DontCheckDefaultBrowser": true,
+    "ExtensionSettings": {
+      "*": {
+        "installation_mode": "blocked"
+      }
+    },
+    "Homepage": {
+      "URL": "https://alphaos.example/kiosk",
+      "Locked": true,
+      "StartPage": "homepage"
+    },
+    "NetworkPrediction": false,
+    "PasswordManagerEnabled": false,
+    "PopupBlocking": {
+      "Allow": [],
+      "Default": true
+    },
+    "Preferences": {
+      "browser.shell.checkDefaultBrowser": false,
+      "browser.tabs.closeWindowWithLastTab": false,
+      "browser.tabs.warnOnClose": false,
+      "browser.startup.page": 1,
+      "browser.download.useDownloadDir": false,
+      "browser.download.manager.addToRecentDocs": false,
+      "privacy.trackingprotection.enabled": true,
+      "privacy.trackingprotection.pbmode.enabled": true,
+      "toolkit.legacyUserProfileCustomizations.stylesheets": true,
+      "dom.disable_open_during_load": true,
+      "dom.allow_scripts_to_close_windows": true,
+      "full-screen-api.ignore-widgets": true
+    },
+    "SanitizeOnShutdown": true,
+    "SearchSuggestEnabled": false,
+    "UserMessaging": {
+      "FeatureRecommendations": false,
+      "ExtensionRecommendations": false,
+      "SkipOnboarding": true
+    }
+  }
+}

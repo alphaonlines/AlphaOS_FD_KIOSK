@@ -1,0 +1,28 @@
+[Unit]
+Description=AlphaOS License Image Availability Probe
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/etc/alphaos/license-url
+
+[Service]
+Type=oneshot
+User=alphaos-licd
+Group=alphaos-licd
+ExecStart=/opt/alphaos/license-image-check.sh
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallFilter=@system-service
+ReadOnlyPaths=/
+ReadWritePaths=/var/lib/alphaos
+StateDirectory=alphaos
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

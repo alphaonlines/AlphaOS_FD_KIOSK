@@ -1,0 +1,12 @@
+[Unit]
+Description=AlphaOS License Validation Scheduler
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=15m
+RandomizedDelaySec=45
+AccuracySec=1s
+Unit=alphaos-license-check.service
+
+[Install]
+WantedBy=timers.target

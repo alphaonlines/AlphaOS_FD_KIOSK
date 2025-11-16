@@ -1,0 +1,11 @@
+[Unit]
+Description=AlphaOS License Image Availability Scheduler
+
+[Timer]
+OnCalendar=*-*-01 03:00:00
+OnCalendar=*-*-15 03:00:00
+Persistent=true
+Unit=alphaos-license-image-check.service
+
+[Install]
+WantedBy=timers.target

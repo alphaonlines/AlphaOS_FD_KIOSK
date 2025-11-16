@@ -1,0 +1,21 @@
+[Unit]
+Description=AlphaOS Touch Kiosk Session
+After=systemd-user-sessions.service network-online.target
+Wants=network-online.target
+
+[Service]
+User=kiosk
+Environment=PORTAL_URL=https://alphaos.example/kiosk
+Environment=MOZ_DISABLE_GMP_SANDBOX=1
+TTYPath=/dev/tty1
+PAMName=login
+WorkingDirectory=/home/kiosk
+ExecStart=/usr/local/bin/alphaos-session.sh
+Restart=on-failure
+RestartSec=5s
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical.target
