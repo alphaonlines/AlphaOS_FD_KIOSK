@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Version 7.0: tiny helper to manage kiosk services.
+set -euo pipefail
+
+UNIT_TARGET="kiosk.target"
+UNIT_SESSION="kiosk-session.service"
+UNIT_UI="kiosk-ui.service"
+UNIT_REBOOT_TIMER="kiosk-reboot.timer"
+
+cmd="${1:-status}"
+
+sc() {
+  systemctl --user "$@"
+}
+
+case "$cmd" in
+  start) sc start "$UNIT_TARGET" ;;
+  stop) sc stop "$UNIT_TARGET" ;;
+  restart) sc restart "$UNIT_TARGET" ;;
+  status) sc status "$UNIT_TARGET" "$UNIT_SESSION" "$UNIT_UI" "$UNIT_REBOOT_TIMER" ;;
+  enable) sc enable "$UNIT_TARGET" "$UNIT_REBOOT_TIMER" ;;
+  disable) sc disable "$UNIT_TARGET" "$UNIT_REBOOT_TIMER" ;;
+  logs) journalctl --user -u "$UNIT_SESSION" -u "$UNIT_UI" -u "$UNIT_REBOOT_TIMER" -n 200 -f ;;
+  doctor)
+    echo "Browser: ${BROWSER:-chromium}"
+    echo "Primary: ${PRIMARY_URL:-https://furnituredistributors.net}"
+    echo "Secondary: ${SECONDARY_URL:-https://alphaonlines.org/pages/aj-test}"
+    echo "Debug port: ${DEBUG_PORT:-9222}"
+    command -v xdotool >/dev/null 2>&1 && echo "xdotool: ok" || echo "xdotool: missing"
+    command -v unclutter >/dev/null 2>&1 && echo "unclutter: ok" || echo "unclutter: missing"
+    command -v zenity >/dev/null 2>&1 && echo "zenity: ok" || echo "zenity: missing"
+    sc list-timers --all 2>/dev/null | grep -q "$UNIT_REBOOT_TIMER" \
+      && echo "reboot timer: scheduled" \
+      || echo "reboot timer: missing (run install.sh)"
+    ;;
+  *)
+    cat <<EOF
+Usage: kioskctl [start|stop|restart|status|enable|disable|logs|doctor]
+EOF
+    ;;
+esac

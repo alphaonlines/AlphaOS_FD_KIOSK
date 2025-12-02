@@ -1,0 +1,53 @@
+! Custom xvkbd resource file for large 3X keyboard (1200x600)
+! Optimized for kiosk display with bold, visible fonts
+
+! Main font configuration - bold bitmap for excellent visibility
+xvkbd*Font: 9x15bold
+
+! Enhanced font sizes for different keyboard elements
+xvkbd*generalFont: 9x15bold
+xvkbd*letterFont: 9x15bold
+xvkbd*specialFont: 9x15bold
+xvkbd*keypadFont: 9x15
+
+! Larger key sizes for 3X scaling (default is 30x30)
+xvkbd*Command.height: 90
+xvkbd*Repeater.height: 90
+xvkbd*Command.width: 90
+xvkbd*Repeater.width: 90
+
+! Larger space bar and special keys
+xvkbd*space.width: 240
+xvkbd*Tab.width: 135
+xvkbd*Control_L.width: 180
+xvkbd*Shift_L.width: 225
+xvkbd*Shift_R.width: 120
+xvkbd*BackSpace.width: 225
+xvkbd*Delete.width: 135
+xvkbd*Return.width: 180
+
+! Enhanced spacing for large keyboard
+xvkbd*row1.vertDistance: 15
+xvkbd*F5.horizDistance: 15
+xvkbd*F9.horizDistance: 15
+xvkbd*BackSpace.horizDistance: 15
+
+! Better contrast and visibility
+xvkbd*Background: gray90
+xvkbd*Foreground: black
+xvkbd*highlightBackground: lightblue
+xvkbd*highlightForeground: darkblue
+
+! Enhanced shadow for better key definition
+xvkbd*shadowWidth: 3
+xvkbd*topShadowContrast: 50
+xvkbd*bottomShadowContrast: 90
+
+! Center alignment for better appearance
+xvkbd*Command.justify: center
+xvkbd*Repeater.justify: center
+xvkbd*Command.internalWidth: 4
+xvkbd*Repeater.internalWidth: 4
+
+! Window geometry for 3X size keyboard
+xvkbd.windowGeometry: 1200x600+360+460
