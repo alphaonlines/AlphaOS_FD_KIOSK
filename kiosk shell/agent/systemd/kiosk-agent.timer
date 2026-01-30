@@ -1,0 +1,10 @@
+[Unit]
+Description=Kiosk Agent Nightly Queue Runner
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+Unit=kiosk-agent-queue.service
+
+[Install]
+WantedBy=timers.target

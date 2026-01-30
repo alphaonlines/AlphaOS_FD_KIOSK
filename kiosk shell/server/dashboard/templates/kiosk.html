@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kiosk {{ kiosk_id }} · Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>Kiosk {{ kiosk_id }}</h1>
+          <div class="subtitle">Commands and status from controller at {{ controller_base }}</div>
+        </div>
+        <div class="toolbar">
+          <button class="secondary" type="button" onclick="window.location.href='/'">Back</button>
+          <button type="button" onclick="dashboard.loadKioskDetail('{{ kiosk_id }}')">Refresh</button>
+        </div>
+      </header>
+
+      <section class="card">
+        <div class="grid" id="kiosk-detail"></div>
+      </section>
+
+      <section class="card" style="margin-top: 20px;">
+        <h2>Actions</h2>
+        <div class="toolbar">
+          <button type="button" onclick="dashboard.issueCommand('{{ kiosk_id }}', 'update_os')">Update OS</button>
+          <button type="button" onclick="dashboard.issueCommand('{{ kiosk_id }}', 'update_repo')">Update Repo</button>
+          <button type="button" onclick="dashboard.issueCommand('{{ kiosk_id }}', 'update_full')">Update Full</button>
+          <button type="button" onclick="dashboard.issueCommand('{{ kiosk_id }}', 'reboot')">Reboot</button>
+        </div>
+        <div id="action-status" class="status-line muted">No action sent yet.</div>
+      </section>
+
+      <section class="card" style="margin-top: 20px;">
+        <h2>Command History</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Cmd ID</th>
+              <th>Action</th>
+              <th>When</th>
+              <th>Status</th>
+              <th>Started</th>
+              <th>Finished</th>
+              <th>Output</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body"></tbody>
+        </table>
+        <div id="history-status" class="status-line muted"></div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        dashboard.loadKioskDetail("{{ kiosk_id }}");
+      });
+    </script>
+  </body>
+</html>

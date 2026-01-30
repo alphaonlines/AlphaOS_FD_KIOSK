@@ -1,0 +1,18 @@
+[Unit]
+Description=Kiosk Agent (MQTT + Heartbeat)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/kiosk-agent/agent/agent.py --config /etc/kiosk-agent/config.json
+WorkingDirectory=/opt/kiosk-agent
+Restart=always
+RestartSec=5
+User=root
+Environment=KIOSK_REPO_PATH=/opt/kiosk-app
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

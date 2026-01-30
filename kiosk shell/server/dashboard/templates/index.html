@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kiosk Fleet Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>Kiosk Fleet</h1>
+          <div class="subtitle">Live status from controller at {{ controller_base }}</div>
+        </div>
+        <div class="toolbar">
+          <button type="button" onclick="dashboard.loadKioskList()">Refresh</button>
+        </div>
+      </header>
+
+      <section class="card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Kiosk ID</th>
+              <th>Location</th>
+              <th>OS Version</th>
+              <th>Git SHA</th>
+              <th>IP</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody id="kiosk-table-body"></tbody>
+        </table>
+        <div id="kiosk-list-status" class="status-line muted"></div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        dashboard.loadKioskList();
+      });
+    </script>
+  </body>
+</html>
