@@ -21,10 +21,35 @@ command -v unclutter >/dev/null 2>&1 && unclutter --timeout 1 --start-hidden &
 
 mkdir -p "$PROFILE_DIR"
 
+detect_touch_device() {
+  local ev=""
+  if [ -r /proc/bus/input/devices ]; then
+    ev="$(awk '
+      /^N: Name=/ { is_touch = ($0 ~ /Touchscreen|touchscreen/) }
+      /^H: Handlers=/ && is_touch {
+        if (match($0, /event[0-9]+/)) {
+          print substr($0, RSTART, RLENGTH)
+          exit
+        }
+        is_touch = 0
+      }
+    ' /proc/bus/input/devices)"
+  fi
+  if [ -n "$ev" ] && [ -e "/dev/input/$ev" ]; then
+    printf "/dev/input/%s" "$ev"
+  fi
+}
+
 launch_chromium() {
   local bin="chromium"
   command -v chromium-browser >/dev/null 2>&1 && bin="chromium-browser"
   command -v google-chrome >/dev/null 2>&1 && bin="google-chrome"
+  local touch_device=""
+  touch_device="$(detect_touch_device || true)"
+  local touch_flags=(--touch-events=enabled --force-touch-events)
+  if [ -n "$touch_device" ]; then
+    touch_flags+=(--touch-devices="$touch_device")
+  fi
 
   exec "$bin" \
     --user-data-dir="$PROFILE_DIR" \
@@ -38,9 +63,7 @@ launch_chromium() {
     --overscroll-history-navigation=0 \
     --password-store=basic \
     --enable-features=OverlayScrollbar,VirtualKeyboard,TouchVirtualKeyboard \
-    --touch-events=enabled \
-    --force-touch-events \
-    --touch-devices=/dev/input/event4 \
+    "${touch_flags[@]}" \
     --test-type \
     --no-first-run \
     --no-default-browser-check \

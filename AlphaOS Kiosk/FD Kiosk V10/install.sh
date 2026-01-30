@@ -75,7 +75,6 @@ EOF
 export CHROMIUM_FLAGS="\$CHROMIUM_FLAGS --enable-features=OverlayScrollbar,VirtualKeyboard,TouchVirtualKeyboard"
 export CHROMIUM_FLAGS="\$CHROMIUM_FLAGS --touch-events=enabled"
 export CHROMIUM_FLAGS="\$CHROMIUM_FLAGS --force-touch-events"
-export CHROMIUM_FLAGS="\$CHROMIUM_FLAGS --touch-devices=/dev/input/event4"
 EOF
   fi
   
