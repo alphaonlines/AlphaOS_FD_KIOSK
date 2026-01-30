@@ -139,7 +139,7 @@ xvkbd*Command.internalWidth: 4
 xvkbd*Repeater.internalWidth: 4
 
 ! Window geometry for 3X size keyboard
-xvkbd.windowGeometry: 1200x600+360+460
+xvkbd.windowGeometry: 1200x600+360+560
 EOF
   
   # Load the X resources for the user

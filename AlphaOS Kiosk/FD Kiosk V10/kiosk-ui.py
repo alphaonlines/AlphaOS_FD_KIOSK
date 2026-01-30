@@ -91,7 +91,7 @@ def start_keyboard():
             [
                 "xvkbd",
                 "-geometry",
-                "1200x600+360+460",
+                "1200x600+360+560",
                 "-xrm",
                 "xvkbd*Font: 9x15bold",
                 "-xrm",
