@@ -233,7 +233,6 @@ class OverlayApp:
 
         self.toggle_button, self.toggle_window = self._make_toggle_window()
         self._make_back_window()
-        self._make_keyboard_window()
 
         GLib.timeout_add(800, self.update_toggle_text)
 
@@ -269,10 +268,6 @@ class OverlayApp:
         x, y = 10, 10
         self._make_window("← Back", go_back, width, height, x, y, "kiosk-back")
 
-    def _make_keyboard_window(self):
-        width, height = 80, 45
-        x, y = self.screen_width - 90, 10
-        self._make_window("⌨", toggle_keyboard, width, height, x, y, "kiosk-keyboard")
 
     def update_toggle_text(self):
         target = target_for_toggle().lower()

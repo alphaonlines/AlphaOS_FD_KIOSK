@@ -8,7 +8,6 @@ Version 10.0 of the FD Kiosk system with ultra-simple toggle functionality using
 - **Font Visibility Fix**: Resolved invisible letters issue with optimized bitmap fonts
 - **3X Keyboard Scaling**: Large 1200x600 keyboard geometry for kiosk displays
 - **Always-On-Top**: Keyboard stays above all windows for easy access
-- **Keyboard Toggle Button**: ⌨ button at top-right for easy keyboard control
 - **Auto-Show Keyboard**: xvkbd auto-appears on focus using AT-SPI accessibility events
 - **Touch Event Optimization**: Enhanced touch event detection and handling
 - **Automatic Configuration**: Both virtual keyboards configured during installation
@@ -23,8 +22,6 @@ Version 10.0 of the FD Kiosk system with ultra-simple toggle functionality using
 ## Button Layout
 ```
 Top-left     +10+10      [← Back]
-
-Top-right    {width-90}+10   [⌨ Keyboard]
 
 Bottom-left  +10+{height-60}  [Furniture Distributors / AlphaPulse]
 ```
@@ -63,7 +60,6 @@ kioskctl start|stop|restart|status|logs|doctor
 
 ## Virtual Keyboard Support
 - **Auto-Show**: On-screen keyboard appears automatically when inputs focus
-- **Keyboard Toggle**: Click ⌨ button to show/hide the keyboard manually
 - **xvkbd External Keyboard**: Large 1200x600 keyboard with 9x15bold font
 - **Automatic Configuration**: Accessibility enabled during install
 
