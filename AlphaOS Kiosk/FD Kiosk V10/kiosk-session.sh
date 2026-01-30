@@ -25,7 +25,11 @@ detect_touch_device() {
   local ev=""
   if [ -r /proc/bus/input/devices ]; then
     ev="$(awk '
-      /^N: Name=/ { is_touch = ($0 ~ /Touchscreen|touchscreen/) }
+      /^N: Name=/ {
+        name = $0
+        lname = tolower($0)
+        is_touch = (lname ~ /touch/ && lname !~ /touchpad/)
+      }
       /^H: Handlers=/ && is_touch {
         if (match($0, /event[0-9]+/)) {
           print substr($0, RSTART, RLENGTH)
@@ -44,8 +48,10 @@ launch_chromium() {
   local bin="chromium"
   command -v chromium-browser >/dev/null 2>&1 && bin="chromium-browser"
   command -v google-chrome >/dev/null 2>&1 && bin="google-chrome"
-  local touch_device=""
-  touch_device="$(detect_touch_device || true)"
+  local touch_device="${TOUCH_DEVICE:-}"
+  if [ -z "$touch_device" ]; then
+    touch_device="$(detect_touch_device || true)"
+  fi
   local touch_flags=(--touch-events=enabled --force-touch-events)
   if [ -n "$touch_device" ]; then
     touch_flags+=(--touch-devices="$touch_device")
@@ -63,6 +69,7 @@ launch_chromium() {
     --overscroll-history-navigation=0 \
     --password-store=basic \
     --enable-features=OverlayScrollbar,VirtualKeyboard,TouchVirtualKeyboard \
+    --force-renderer-accessibility \
     "${touch_flags[@]}" \
     --test-type \
     --no-first-run \

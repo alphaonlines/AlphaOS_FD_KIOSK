@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Version 10.0 with integrated xvkbd keyboard:
+Version 10.0 GTK overlay UI:
 - Toggle button swaps PRIMARY_URL/SECONDARY_URL
 - Back sends Alt+Left
-- External xvkbd keyboard with 9x15bold font
-- Keyboard toggle button at top-right
-- Scroll buttons removed (native scrolling works well)
+- xvkbd on-screen keyboard with auto-show via AT-SPI focus events
 """
 import os
 import subprocess
-import tkinter as tk
-from pathlib import Path
-import signal
 import threading
 
+import gi
 import requests
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("Atspi", "2.0")
+from gi.repository import Atspi, Gdk, Gtk, GLib
 
 # Ensure xdotool can see the display when run under systemd
 os.environ.setdefault("DISPLAY", ":0")
@@ -57,7 +57,7 @@ def toggle():
     try:
         requests.put(f"http://127.0.0.1:{DEBUG_PORT}/json/new?{target}", timeout=2)
         write_state(target)
-    except:
+    except Exception:
         pass
 
 
@@ -65,62 +65,45 @@ def go_back():
     subprocess.run(["xdotool", "key", "Alt_L+Left"], check=False)
 
 
-# Keyboard management
+# Keyboard management (xvkbd)
 keyboard_process = None
+autoshow_suppressed = False
+last_focus_editable = False
+
 
 def toggle_keyboard():
-    global keyboard_process
+    global autoshow_suppressed
     if keyboard_process and keyboard_process.poll() is None:
         stop_keyboard()
+        if last_focus_editable:
+            autoshow_suppressed = True
     else:
+        autoshow_suppressed = False
         start_keyboard()
+
 
 def start_keyboard():
     global keyboard_process
+    if keyboard_process and keyboard_process.poll() is None:
+        return
     try:
-        # Position keyboard at bottom center of screen with 3X size
-        # Screen: 1920x1080, Keyboard: 1200x600 (3X default)
-        # Centered horizontally: (1920-1200)/2 = 360px from left
-        # Bottom positioned: 1080-600-20 = 460px from top (20px margin)
-        keyboard_process = subprocess.Popen([
-            "xvkbd", 
-            "-geometry", "1200x600+360+460",
-            # Bold bitmap font for excellent visibility with 3X scaling
-            "-xrm", "xvkbd*Font: 9x15bold",
-            # Set window name for easier identification
-            "-xrm", "xvkbd.name: KioskKeyboard"
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL)
-        
-        # Wait for window to appear, then set always-on-top
+        keyboard_process = subprocess.Popen(
+            [
+                "xvkbd",
+                "-geometry",
+                "1200x600+360+460",
+                "-xrm",
+                "xvkbd*Font: 9x15bold",
+                "-xrm",
+                "xvkbd.name: KioskKeyboard",
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         threading.Timer(1.0, set_keyboard_always_on_top).start()
-        
     except FileNotFoundError:
-        # xvkbd not installed, show error or silently fail
         pass
 
-def set_keyboard_always_on_top():
-    """Set xvkbd window to always stay on top"""
-    try:
-        # Find the xvkbd window by name or class
-        result = subprocess.run(
-            ["wmctrl", "-l", "-x"], 
-            capture_output=True, text=True, timeout=5
-        )
-        
-        # Look for xvkbd window
-        for line in result.stdout.split('\n'):
-            if 'xvkbd' in line.lower() or 'KioskKeyboard' in line:
-                window_id = line.split()[0]
-                # Set window to "above" state (always on top)
-                subprocess.run([
-                    "wmctrl", "-ir", window_id, "-b", "add,above"
-                ], check=False, timeout=5)
-                break
-    except Exception:
-        # If anything fails, keyboard will still work without always-on-top
-        pass
 
 def stop_keyboard():
     global keyboard_process
@@ -130,103 +113,178 @@ def stop_keyboard():
             keyboard_process.wait(timeout=2)
         except subprocess.TimeoutExpired:
             keyboard_process.kill()
-        keyboard_process = None
+    keyboard_process = None
 
 
+def set_keyboard_always_on_top():
+    """Set xvkbd window to always stay on top."""
+    try:
+        result = subprocess.run(
+            ["wmctrl", "-l", "-x"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        for line in result.stdout.split("\n"):
+            if "xvkbd" in line.lower() or "KioskKeyboard" in line:
+                window_id = line.split()[0]
+                subprocess.run(
+                    ["wmctrl", "-ir", window_id, "-b", "add,above"],
+                    check=False,
+                    timeout=5,
+                )
+                break
+    except Exception:
+        pass
+
+
+def is_editable(obj):
+    try:
+        state = obj.get_state_set()
+        if state and state.contains(Atspi.StateType.EDITABLE):
+            return True
+    except Exception:
+        pass
+    try:
+        role = obj.get_role()
+        if role in (
+            Atspi.Role.ENTRY,
+            Atspi.Role.PASSWORD_TEXT,
+            Atspi.Role.TEXT,
+            Atspi.Role.PARAGRAPH,
+            Atspi.Role.DOCUMENT_TEXT,
+        ):
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def on_focus_event(event):
+    global autoshow_suppressed, last_focus_editable
+    try:
+        focused = bool(event.detail1)
+    except Exception:
+        focused = False
+    if not focused:
+        return
+    obj = event.source
+    editable = is_editable(obj)
+    last_focus_editable = editable
+    if editable:
+        if not autoshow_suppressed:
+            start_keyboard()
+    else:
+        autoshow_suppressed = False
+        stop_keyboard()
+
+
+def start_focus_monitor():
+    try:
+        Atspi.init()
+        listener = Atspi.EventListener.new(on_focus_event)
+        listener.register("object:state-changed:focused")
+    except Exception:
+        pass
+
+
+def apply_css():
+    css = b"""
+    .kiosk-window {
+      background-color: #1c1c1c;
+    }
+    button.kiosk-button {
+      background: #2f2f2f;
+      color: #ffffff;
+      border: none;
+      border-radius: 0;
+      font-weight: bold;
+      font-family: Sans;
+    }
+    button.kiosk-toggle {
+      font-size: 12px;
+    }
+    button.kiosk-back {
+      font-size: 12px;
+    }
+    button.kiosk-keyboard {
+      font-size: 16px;
+    }
+    """
+    provider = Gtk.CssProvider()
+    provider.load_from_data(css)
+    screen = Gdk.Screen.get_default()
+    if screen:
+        Gtk.StyleContext.add_provider_for_screen(
+            screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
 
 
 class OverlayApp:
     def __init__(self):
-        self.root = tk.Tk()
-        self.root.overrideredirect(True)
-        self.root.attributes("-topmost", True)
-        self.root.configure(bg="#1c1c1c")
-        self.root.withdraw()
+        apply_css()
+        screen = Gdk.Screen.get_default()
+        if screen is None:
+            raise RuntimeError("No display available for GTK")
+        self.screen_width = screen.get_width()
+        self.screen_height = screen.get_height()
 
-        self.toggle_button = self._make_toggle_window()
+        start_focus_monitor()
+
+        self.toggle_button, self.toggle_window = self._make_toggle_window()
         self._make_back_window()
         self._make_keyboard_window()
 
-        self.update_toggle_text()
+        GLib.timeout_add(800, self.update_toggle_text)
+
+    def _make_window(self, label, on_click, width, height, x, y, style_class):
+        win = Gtk.Window()
+        win.set_decorated(False)
+        win.set_keep_above(True)
+        win.set_resizable(False)
+        win.set_skip_taskbar_hint(True)
+        win.set_skip_pager_hint(True)
+        win.set_type_hint(Gdk.WindowTypeHint.DOCK)
+        win.set_app_paintable(True)
+        win.get_style_context().add_class("kiosk-window")
+
+        btn = Gtk.Button(label=label)
+        btn.get_style_context().add_class("kiosk-button")
+        btn.get_style_context().add_class(style_class)
+        btn.connect("clicked", lambda *_: on_click())
+        win.add(btn)
+
+        win.set_default_size(width, height)
+        win.show_all()
+        win.move(x, y)
+        return btn, win
 
     def _make_toggle_window(self):
-        win = tk.Toplevel(self.root)
-        win.overrideredirect(True)
-        win.attributes("-topmost", True)
-        win.configure(bg="#1c1c1c")
-        btn = tk.Button(
-            win,
-            text="Toggle",
-            command=toggle,
-            fg="#ffffff",
-            bg="#2f2f2f",
-            bd=0,
-            padx=12,
-            pady=6,
-            activebackground="#444444",
-            font=("Arial", 10, "bold"),
-        )
-        btn.pack(fill="both", expand=True)
-        win.update_idletasks()
-        height = win.winfo_screenheight()
-        win.geometry(f"220x50+10+{height-60}")
-        return btn
+        width, height = 220, 50
+        x, y = 10, self.screen_height - 60
+        return self._make_window("Toggle", toggle, width, height, x, y, "kiosk-toggle")
 
     def _make_back_window(self):
-        win = tk.Toplevel(self.root)
-        win.overrideredirect(True)
-        win.attributes("-topmost", True)
-        win.configure(bg="#1c1c1c")
-        btn = tk.Button(
-            win,
-            text="← Back",
-            command=go_back,
-            fg="#ffffff",
-            bg="#2f2f2f",
-            bd=0,
-            padx=10,
-            pady=4,
-            activebackground="#444444",
-            font=("Arial", 10, "bold"),
-        )
-        btn.pack(fill="both", expand=True)
-        win.geometry("120x45+10+10")
+        width, height = 120, 45
+        x, y = 10, 10
+        self._make_window("← Back", go_back, width, height, x, y, "kiosk-back")
 
     def _make_keyboard_window(self):
-        win = tk.Toplevel(self.root)
-        win.overrideredirect(True)
-        win.attributes("-topmost", True)
-        win.configure(bg="#1c1c1c")
-        btn = tk.Button(
-            win,
-            text="⌨",
-            command=toggle_keyboard,
-            fg="#ffffff",
-            bg="#2f2f2f",
-            bd=0,
-            padx=8,
-            pady=4,
-            activebackground="#444444",
-            font=("Arial", 12, "bold"),
-        )
-        btn.pack(fill="both", expand=True)
-        # Position at top-right corner
-        width = win.winfo_screenwidth()
-        win.geometry(f"80x45+{width-90}+10")
-
-
+        width, height = 80, 45
+        x, y = self.screen_width - 90, 10
+        self._make_window("⌨", toggle_keyboard, width, height, x, y, "kiosk-keyboard")
 
     def update_toggle_text(self):
         target = target_for_toggle().lower()
         label = "Furniture Distributors" if target.startswith(PRIMARY_URL.lower()) else "AlphaPulse"
-        self.toggle_button.config(text=label)
-        self.root.after(800, self.update_toggle_text)
+        self.toggle_button.set_label(label)
+        return True
 
     def run(self):
         try:
-            self.root.mainloop()
+            self.toggle_window.connect("destroy", Gtk.main_quit)
+            Gtk.main()
         finally:
-            # Clean up keyboard process on exit
             stop_keyboard()
 
 

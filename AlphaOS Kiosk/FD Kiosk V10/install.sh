@@ -34,7 +34,8 @@ install_packages() {
     chromium chromium-sandbox firefox-esr
     xdotool wmctrl unclutter zenity
     jq curl dbus-x11 x11-xserver-utils
-    python3-tk python3-requests
+    python3-gi gir1.2-gtk-3.0 python3-requests
+    at-spi2-core
     xvkbd xfonts-75dpi xfonts-100dpi
   )
   if [ "$SKIP_APT" != "0" ]; then
@@ -145,6 +146,13 @@ EOF
   sudo -u "$KIOSK_USER" xrdb -merge "$KIOSK_HOME/.Xresources" || warn "Failed to load X resources"
   
   log "xvkbd keyboard configuration completed"
+}
+
+configure_accessibility() {
+  log "Configuring accessibility (AT-SPI)..."
+  sudo -u "$KIOSK_USER" dbus-launch gsettings set org.gnome.desktop.interface toolkit-accessibility true || true
+  sudo -u "$KIOSK_USER" dbus-launch gsettings set org.gnome.desktop.a11y.applications screen-keyboard-enabled true || true
+  log "Accessibility configuration completed"
 }
 
 deploy_scripts() {
@@ -320,6 +328,7 @@ main() {
   ensure_user
   install_packages
   configure_virtual_keyboard
+  configure_accessibility
   configure_xvkbd_keyboard
   deploy_scripts
   deploy_units

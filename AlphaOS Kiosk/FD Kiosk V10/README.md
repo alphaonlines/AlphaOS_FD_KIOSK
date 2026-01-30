@@ -1,7 +1,7 @@
 # FD Kiosk Version 10.0
 
 ## Overview
-Version 10.0 of the FD Kiosk system with ultra-simple toggle functionality using Chromium debug API, built-in virtual keyboard support, and integrated xvkbd external keyboard with visible bold fonts.
+Version 10.0 of the FD Kiosk system with ultra-simple toggle functionality using Chromium debug API, xvkbd auto-show keyboard support (via AT-SPI focus events), and integrated xvkbd external keyboard with visible bold fonts.
 
 ## Key Improvements
 - **xvkbd External Keyboard**: Integrated external keyboard with 9x15bold font for excellent visibility
@@ -9,7 +9,7 @@ Version 10.0 of the FD Kiosk system with ultra-simple toggle functionality using
 - **3X Keyboard Scaling**: Large 1200x600 keyboard geometry for kiosk displays
 - **Always-On-Top**: Keyboard stays above all windows for easy access
 - **Keyboard Toggle Button**: ⌨ button at top-right for easy keyboard control
-- **Virtual Keyboard Support**: Built-in Chromium virtual keyboard enabled for touch screens
+- **Auto-Show Keyboard**: xvkbd auto-appears on focus using AT-SPI accessibility events
 - **Touch Event Optimization**: Enhanced touch event detection and handling
 - **Automatic Configuration**: Both virtual keyboards configured during installation
 - **Ultra-Simple Toggle**: 3-line function using debug API instead of complex window detection
@@ -54,22 +54,18 @@ kioskctl start|stop|restart|status|logs|doctor
 - Debug Port: 9222
 
 ## Files
-- `kiosk-ui.py`: UI with toggle, back, and keyboard buttons
+- `kiosk-ui.py`: UI with toggle, back, and keyboard button
 - `kiosk-session.sh`: Browser launcher script
-- `install.sh`: Installation and configuration script with xvkbd support
+- `install.sh`: Installation and configuration script with accessibility + xvkbd support
 - `kioskctl`: Management utility
 - `kiosk-reboot-if-idle.sh`: Nightly reboot script
 - `.Xresources`: xvkbd font and geometry configuration
 
 ## Virtual Keyboard Support
+- **Auto-Show**: On-screen keyboard appears automatically when inputs focus
+- **Keyboard Toggle**: Click ⌨ button to show/hide the keyboard manually
 - **xvkbd External Keyboard**: Large 1200x600 keyboard with 9x15bold font
-- **Font Visibility**: Bold bitmap fonts ensure letters are clearly visible
-- **Always-On-Top**: Keyboard stays above all windows for easy access
-- **Keyboard Toggle**: Click ⌨ button to show/hide keyboard
-- **Automatic Configuration**: Both virtual keyboards configured during installation
-- **Touch Device Detection**: Automatically detects and configures touch screens
-- **System-wide**: Works for all Chromium instances on the system
-- **Touch Events**: Enhanced touch event handling for kiosk mode
+- **Automatic Configuration**: Accessibility enabled during install
 
 ## Troubleshooting
 - Toggle button not working? Check debug port: `curl http://127.0.0.1:9222/json/list`
@@ -77,8 +73,8 @@ kioskctl start|stop|restart|status|logs|doctor
 - Button text wrong? Check state file: `cat /tmp/kiosk-current-url.txt`
 - xvkbd keyboard not visible? Check font: `xlsfonts | grep 9x15bold`
 - xvkbd letters missing? Check resources: `xrdb -query | grep xvkbd`
-- Virtual keyboard not appearing? Check policies: Visit `chrome://policy` in Chromium
-- Touch events not working? Verify device: `cat /proc/bus/input/devices | grep -A5 -B5 "Touch"`
+- Keyboard not appearing? Check it is running: `pgrep -x xvkbd`
+- Auto-show not working? Verify accessibility: `gsettings get org.gnome.desktop.interface toolkit-accessibility`
 
 ## Technical Notes
 - Uses Chromium Remote Debugging Protocol for reliable navigation
