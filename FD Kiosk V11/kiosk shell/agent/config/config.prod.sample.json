@@ -1,0 +1,21 @@
+{
+  "kiosk_id": "kiosk-nyc-01",
+  "location": "NYC - 5th Ave",
+  "topic_prefix": "kiosk",
+  "broker_host": "BROKER_HOSTNAME",
+  "broker_port": 8883,
+  "tls_ca": "/etc/kiosk-agent/certs/ca.crt",
+  "tls_cert": "/etc/kiosk-agent/certs/client.crt",
+  "tls_key": "/etc/kiosk-agent/certs/client.key",
+  "tls_insecure": false,
+  "mqtt_keepalive": 60,
+  "heartbeat_interval_sec": 45,
+  "repo_path": "/opt/kiosk-app",
+  "services": ["kiosk-session.service", "kiosk-ui.service"],
+  "update_runner_path": "/usr/local/lib/kiosk-agent/update_runner.sh",
+  "update_timeout_sec": 1800,
+  "queue_path": "/var/lib/kiosk-agent/queue.json",
+  "run_lock_path": "/var/lib/kiosk-agent/run.lock",
+  "log_path": "/var/lib/kiosk-agent/agent.log",
+  "last_update_path": "/var/lib/kiosk-agent/last_update.json"
+}

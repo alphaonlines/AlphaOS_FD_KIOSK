@@ -1,0 +1,14 @@
+{
+  "http": {
+    "host": "127.0.0.1",
+    "port": 8080
+  },
+  "mqtt": {
+    "host": "BROKER_HOSTNAME",
+    "port": 8883,
+    "ca_cert": "/etc/kiosk-controller/certs/ca.crt",
+    "client_cert": "/etc/kiosk-controller/certs/controller.crt",
+    "client_key": "/etc/kiosk-controller/certs/controller.key"
+  },
+  "db_path": "/var/lib/kiosk-controller/controller.db"
+}

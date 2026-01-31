@@ -1,0 +1,21 @@
+{
+  "kiosk_id": "kiosk-001",
+  "location": "LOCAL-SETUP",
+  "topic_prefix": "kiosk",
+  "broker_host": "127.0.0.1",
+  "broker_port": 8883,
+  "tls_ca": "/home/fduser/Desktop/FD Kiosk V11/kiosk shell/server/broker/certs/ca/ca.crt",
+  "tls_cert": "/home/fduser/Desktop/FD Kiosk V11/kiosk shell/server/broker/certs/clients/kiosk-001.crt",
+  "tls_key": "/home/fduser/Desktop/FD Kiosk V11/kiosk shell/server/broker/certs/clients/kiosk-001.key",
+  "tls_insecure": false,
+  "mqtt_keepalive": 60,
+  "heartbeat_interval_sec": 10,
+  "repo_path": "/home/fduser/Desktop/FD Kiosk V11",
+  "services": ["kiosk-session.service", "kiosk-ui.service"],
+  "update_runner_path": "/home/fduser/Desktop/FD Kiosk V11/kiosk shell/agent/scripts/update_runner.sh",
+  "update_timeout_sec": 300,
+  "queue_path": "/home/fduser/kiosk-agent/queue.json",
+  "run_lock_path": "/home/fduser/kiosk-agent/run.lock",
+  "log_path": "/home/fduser/kiosk-agent/agent.log",
+  "last_update_path": "/home/fduser/kiosk-agent/last_update.json"
+}

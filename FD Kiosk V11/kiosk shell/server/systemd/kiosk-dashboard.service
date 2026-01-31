@@ -1,0 +1,18 @@
+[Unit]
+Description=Kiosk Dashboard UI
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/kiosk-shell/server/dashboard
+ExecStart=/usr/bin/python3 /opt/kiosk-shell/server/dashboard/app.py
+Restart=always
+RestartSec=5
+User=kiosk
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

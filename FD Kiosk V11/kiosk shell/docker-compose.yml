@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  broker:
+    image: eclipse-mosquitto:2
+    ports:
+      - "8883:8883"
+    volumes:
+      - ./server/broker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./server/broker/acl.conf:/mosquitto/config/acl.conf:ro
+      - ./server/broker/certs:/mosquitto/config/certs:ro
+      - ./server/data:/mosquitto/data
+    restart: unless-stopped
+
+  controller:
+    build:
+      context: ./server/controller
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./server/controller:/app
+      - ./server/data:/data
+      - /etc/kiosk-controller/certs:/etc/kiosk-controller/certs:ro
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: ./server/dashboard
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./server/dashboard:/app
+    ports:
+      - "8090:8090"
+    restart: unless-stopped

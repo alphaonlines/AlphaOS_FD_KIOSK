@@ -1,0 +1,14 @@
+{
+  "http": {
+    "host": "127.0.0.1",
+    "port": 8080
+  },
+  "mqtt": {
+    "host": "127.0.0.1",
+    "port": 8883,
+    "ca_cert": "/home/fduser/Desktop/FD Kiosk V11/kiosk shell/server/broker/certs/ca/ca.crt",
+    "client_cert": "/home/fduser/Desktop/FD Kiosk V11/kiosk shell/server/broker/certs/clients/controller.crt",
+    "client_key": "/home/fduser/Desktop/FD Kiosk V11/kiosk shell/server/broker/certs/clients/controller.key"
+  },
+  "db_path": "../data/controller.db"
+}
